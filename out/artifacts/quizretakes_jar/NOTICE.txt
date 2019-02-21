@@ -1,0 +1,1 @@
+This .jar file must be placed in the same directory as the 'data/' folder required to operate this application.
