@@ -93,10 +93,4 @@ public class retakeBean implements Comparable<retakeBean>
       return timeOffered.toString();
    }
 
-/*
-   public String getQuizId() {
-      return quizId;
-   }
-*/
-
 }

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.time.*;
 import java.lang.Long;
 import java.lang.String;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -44,7 +43,7 @@ import java.io.BufferedWriter;
 public class quizschedule extends JFrame implements ActionListener{
 
     //flag to turn debugging features on/off
-    private Boolean DEBUG = false;
+    private Boolean DEBUG = true;
 
     //pre-defined program data
     private static final String dataLocation = "data/";
@@ -69,11 +68,17 @@ public class quizschedule extends JFrame implements ActionListener{
     private courseBean course;
     private quizzes quizList;
     private retakes retakesList;
+    private appointments appointmentList;
 
     //critical GUI components and gathered information
+    private JPanel schedule_retake_form_panel;
+    private JPanel view_appointments_form_panel;
     private JTextField student_name_input_field;
-    private ArrayList<JCheckBox> quiz_retake_selection = new ArrayList<>();
-    private ArrayList<String> quiz_retake_selection_ids = new ArrayList<>();
+    private ArrayList<JCheckBox> quiz_retake_selection;
+    private ArrayList<String> quiz_retake_selection_ids;
+    private boolean appts_sort_by_name_toggle = true;
+    private boolean appts_sort_by_quizID_toggle = true;
+    private boolean appts_sort_by_retakeID_toggle = true;
 
 
     /**
@@ -91,7 +96,7 @@ public class quizschedule extends JFrame implements ActionListener{
      */
     private quizschedule(){
         super("Quiz Retakes");
-        setSize(1000, 750);
+        setSize(1000, 785);
         setResizable(false);
         setLocation(100,50);
 
@@ -101,63 +106,37 @@ public class quizschedule extends JFrame implements ActionListener{
         //populate class fields with necessary data to populate GUI
         get_data();
 
-        //header and intro information
-        JLabel intro_label = new JLabel(String.format("GMU quiz retake scheduler for class %s", course.getCourseTitle()));
-        intro_label.setHorizontalAlignment(SwingConstants.CENTER);
-        getContentPane().add(intro_label, BorderLayout.PAGE_START);
+        //build menu bar for GUI
+        JMenuBar menu_bar = new JMenuBar();
 
-        //student quiz retake selection form
-        JLabel student_form_label = new JLabel("Retake Selection Form:");
-        student_form_label.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JPanel student_form = new JPanel();
-        populate_student_form(student_form);
-        JScrollPane student_form_scroll_pane = new JScrollPane(student_form);
-        student_form_scroll_pane.setPreferredSize(new Dimension(400, 625));
-        student_form_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        student_form_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //Form options toggle between different program functionality
+        JMenu form_options_menu = new JMenu("Form Options");
 
-        JPanel gui_left_panel = new JPanel();
-        gui_left_panel.add(student_form_label, BorderLayout.PAGE_START);
-        gui_left_panel.add(student_form_scroll_pane, BorderLayout.CENTER);
+        JMenuItem schedule_retake_form = new JMenuItem("Schedule Retake");
+        schedule_retake_form.setActionCommand("show_schedule_retake_form");
+        schedule_retake_form.addActionListener(this);
 
-        //list of all available quiz retakes
-        JLabel retake_list_label = new JLabel("List of all quiz retakes:");
-        retake_list_label.setHorizontalAlignment(SwingConstants.CENTER);
+        JMenuItem view_appointments_form = new JMenuItem("View Scheduled Appointments");
+        view_appointments_form.setActionCommand("show_view_appointments_form");
+        view_appointments_form.addActionListener(this);
 
-        JPanel retake_list = new JPanel();
-        populate_retakes_list(retake_list);
-        JScrollPane retake_list_scroll_pane = new JScrollPane(retake_list);
-        retake_list_scroll_pane.setPreferredSize(new Dimension(400, 625));
-        retake_list_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        retake_list_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        form_options_menu.add(schedule_retake_form);
+        form_options_menu.add(view_appointments_form);
 
-        JPanel gui_right_panel = new JPanel();
-        gui_right_panel.add(retake_list_label, BorderLayout.PAGE_START);
-        gui_right_panel.add(retake_list_scroll_pane, BorderLayout.CENTER);
+        menu_bar.add(form_options_menu);
+        setJMenuBar(menu_bar);
 
-        //split content of GUI horizontally
-        JPanel content_panel = new JPanel();
-        content_panel.setLayout(new GridLayout(1, 2));
-        content_panel.add(gui_left_panel);
-        content_panel.add(gui_right_panel);
-        getContentPane().add(content_panel);
+        //build and add form panel components and other gui content
+        schedule_retake_form_panel = new JPanel();
+        schedule_retake_form_panel.setPreferredSize(new Dimension(1000, 750));
+        build_schedule_retake_form();
 
-        //bottom button panel
-        JButton submit_button = new JButton("Submit");
-        submit_button.setActionCommand("student_form_submit");
-        submit_button.addActionListener(this);
-        submit_button.setHorizontalAlignment(SwingConstants.CENTER);
+        view_appointments_form_panel = new JPanel();
+        view_appointments_form_panel.setPreferredSize(new Dimension(1000, 750));
+        build_view_appointments_form();
 
-        JButton close_button = new JButton("Close");
-        close_button.setActionCommand("close_form");
-        close_button.addActionListener(this);
-        close_button.setHorizontalAlignment(SwingConstants.CENTER);
-
-        JPanel bottom_button_panel = new JPanel();
-        bottom_button_panel.add(submit_button, BorderLayout.CENTER);
-        bottom_button_panel.add(close_button, BorderLayout.CENTER);
-        getContentPane().add(bottom_button_panel, BorderLayout.PAGE_END);
+        getContentPane().add(schedule_retake_form_panel, BorderLayout.CENTER);
     }
 
 
@@ -189,9 +168,11 @@ public class quizschedule extends JFrame implements ActionListener{
         // Load the quizzes and the retake times from disk
         quizReader qr = new quizReader();
         retakesReader rr = new retakesReader();
+        apptsReader ar = new apptsReader();
         try {
             quizList = qr.read (quizzesFileName);
             retakesList = rr.read (retakesFileName);
+            appointmentList = ar.read(apptsFileName);
         }
         catch (Exception e) {
             String message = String.format("Can't find the data files (%s, %s) for course ID '%s'. Current working directory is: %s\n", quizzesFileName, retakesFileName, course, System.getProperty("user.dir"));
@@ -204,45 +185,121 @@ public class quizschedule extends JFrame implements ActionListener{
 
         if(DEBUG){
             //output all gathered data to console for debug purposes
-            System.out.format("Course information read from file '%s':\n", courseFileName);
+            System.out.format("\nCourse information read from file '%s':\n", courseFileName);
             System.out.format("%s\n", course.toString());
 
-            System.out.format("List of quizzes read from file '%s':\n", quizzesFileName);
+            System.out.format("\nList of quizzes read from file '%s':\n", quizzesFileName);
             for (quizBean q : quizList) {
                 System.out.format("%s\n", q.toString());
             }
 
-            System.out.format("List of retakes read from file '%s':\n", retakesFileName);
+            System.out.format("\nList of retakes read from file '%s':\n", retakesFileName);
             for (retakeBean r : retakesList) {
                 System.out.format("%s\n", r.toString());
             }
+
+            System.out.format("\nList of appointments read from file '%s':\n", apptsFileName);
+            for (apptBean a : appointmentList) {
+                System.out.format("%s\n", a.toString());
+            }
+
+            System.out.format("\n");
         }
+    }
+
+
+    /**
+     * Method to build schedule retake form (asst2)
+     */
+    private void build_schedule_retake_form(){
+        //clear former contents before building
+        schedule_retake_form_panel = new JPanel();
+
+        //header and intro information
+        JLabel intro_label = new JLabel(String.format("GMU quiz retake scheduler for class %s", course.getCourseTitle()));
+        intro_label.setHorizontalAlignment(SwingConstants.CENTER);
+        schedule_retake_form_panel.add(intro_label, BorderLayout.PAGE_START);
+
+        //student quiz retake selection form
+        JLabel student_form_label = new JLabel("Retake Selection Form:");
+        student_form_label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel student_form = new JPanel();
+        populate_student_form(student_form);
+        JScrollPane student_form_scroll_pane = new JScrollPane(student_form);
+        student_form_scroll_pane.setPreferredSize(new Dimension(400, 625));
+        student_form_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        student_form_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JPanel gui_left_panel = new JPanel();
+        gui_left_panel.setPreferredSize(new Dimension(500, 650));
+        gui_left_panel.add(student_form_label, BorderLayout.PAGE_START);
+        gui_left_panel.add(student_form_scroll_pane, BorderLayout.CENTER);
+
+        //list of all available quiz retakes
+        JLabel retake_list_label = new JLabel("List of all quiz retakes:");
+        retake_list_label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel retake_list = new JPanel();
+        populate_retakes_list(retake_list);
+        JScrollPane retake_list_scroll_pane = new JScrollPane(retake_list);
+        retake_list_scroll_pane.setPreferredSize(new Dimension(400, 625));
+        retake_list_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        retake_list_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JPanel gui_right_panel = new JPanel();
+        gui_right_panel.setPreferredSize(new Dimension(500, 650));
+        gui_right_panel.add(retake_list_label, BorderLayout.PAGE_START);
+        gui_right_panel.add(retake_list_scroll_pane, BorderLayout.CENTER);
+
+        //split content of GUI horizontally
+        JPanel content_panel = new JPanel();
+        content_panel.setLayout(new GridLayout(1, 2));
+        content_panel.add(gui_left_panel);
+        content_panel.add(gui_right_panel);
+        schedule_retake_form_panel.add(content_panel);
+
+        //bottom button panel
+        JButton submit_button = new JButton("Submit");
+        submit_button.setActionCommand("student_form_submit");
+        submit_button.addActionListener(this);
+        submit_button.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JButton close_button = new JButton("Close");
+        close_button.setActionCommand("close_form");
+        close_button.addActionListener(this);
+        close_button.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel bottom_button_panel = new JPanel();
+        bottom_button_panel.add(submit_button, BorderLayout.CENTER);
+        bottom_button_panel.add(close_button, BorderLayout.CENTER);
+        schedule_retake_form_panel.add(bottom_button_panel, BorderLayout.PAGE_END);
     }
 
 
     /**
      * Method to populate contents of student quiz retake selection form
      *
-     * @param student_form JPanel where the quiz retake selection form will be put
+     * @param student_form_panel JPanel where the quiz retake selection form will be put
      */
-    private void populate_student_form(JPanel student_form){
+    private void populate_student_form(JPanel student_form_panel){
         //set BoxLayout so each item can be placed below the next
-        student_form.setLayout(new BoxLayout(student_form, BoxLayout.Y_AXIS));
+        student_form_panel.setLayout(new BoxLayout(student_form_panel, BoxLayout.Y_AXIS));
 
         JLabel form_output_label;
         JLabel line_break_label;
 
         form_output_label = new JLabel("You can sign up for quiz retakes within the next two weeks. ");
-        student_form.add(form_output_label);
+        student_form_panel.add(form_output_label);
 
         line_break_label = new JLabel(" ");
-        student_form.add(line_break_label);
+        student_form_panel.add(line_break_label);
 
         form_output_label = new JLabel("Enter your name (as it appears on the class roster), then select");
-        student_form.add(form_output_label);
+        student_form_panel.add(form_output_label);
 
         form_output_label = new JLabel("which date, time, and quiz you wish to retake from the following list.");
-        student_form.add(form_output_label);
+        student_form_panel.add(form_output_label);
 
         // Check for a week to skip
         boolean skip = false;
@@ -261,35 +318,38 @@ public class quizschedule extends JFrame implements ActionListener{
         }
 
         line_break_label = new JLabel(" ");
-        student_form.add(line_break_label);
+        student_form_panel.add(line_break_label);
 
         form_output_label = new JLabel(String.format("Today is %s, %s %s.", today.getDayOfWeek(), today.getMonth(), today.getDayOfMonth()));
-        student_form.add(form_output_label);
+        student_form_panel.add(form_output_label);
 
         form_output_label = new JLabel("Currently scheduling quizzes for the next two weeks, until");
-        student_form.add(form_output_label);
+        student_form_panel.add(form_output_label);
 
         form_output_label = new JLabel(String.format("%s, %s %s.", endDay.getDayOfWeek(), endDay.getMonth(), endDay.getDayOfMonth()));
-        student_form.add(form_output_label);
+        student_form_panel.add(form_output_label);
 
         line_break_label = new JLabel(" ");
-        student_form.add(line_break_label);
+        student_form_panel.add(line_break_label);
 
         form_output_label = new JLabel("Name:");
-        student_form.add(form_output_label);
+        student_form_panel.add(form_output_label);
 
         student_name_input_field = new JTextField();
         student_name_input_field.setMaximumSize(new Dimension(500, 30));
-        student_form.add(student_name_input_field);
+        student_form_panel.add(student_name_input_field);
 
         line_break_label = new JLabel(" ");
-        student_form.add(line_break_label);
+        student_form_panel.add(line_break_label);
 
         form_output_label = new JLabel("Quiz retakes available:");
-        student_form.add(form_output_label);
+        student_form_panel.add(form_output_label);
 
         line_break_label = new JLabel(" ");
-        student_form.add(line_break_label);
+        student_form_panel.add(line_break_label);
+
+        quiz_retake_selection = new ArrayList<>();
+        quiz_retake_selection_ids = new ArrayList<>();
 
         for(retakeBean r: retakesList) {
             LocalDate retakeDay = r.getDate();
@@ -297,14 +357,14 @@ public class quizschedule extends JFrame implements ActionListener{
                 // if skip && retakeDay is after the skip week, print a white bg message
                 if (skip && retakeDay.isAfter(origEndDay)) {  // A "skip" week such as spring break.
                     form_output_label = new JLabel("Skipping a week, no quiz or retakes.");
-                    student_form.add(form_output_label);
+                    student_form_panel.add(form_output_label);
                     // Just print for the FIRST retake day after the skip week
                     skip = false;
                 }
                 retakePrinted = true;
                 // format: Friday, January 12, at 10:00am in EB 4430
                 form_output_label = new JLabel(String.format("%s, %s %s, at %s in %s", retakeDay.getDayOfWeek(), retakeDay.getMonth(), retakeDay.getDayOfMonth(), r.timeAsString(), r.getLocation()));
-                student_form.add(form_output_label);
+                student_form_panel.add(form_output_label);
 
                 for(quizBean q: quizList) {
                     LocalDate quizDay = q.getDate();
@@ -316,12 +376,12 @@ public class quizschedule extends JFrame implements ActionListener{
                         JCheckBox temp_checkbok = new JCheckBox(String.format("Quiz %s from %s, %s %s", q.getID(), quizDay.getDayOfWeek(), quizDay.getMonth(), quizDay.getDayOfMonth()));
                         quiz_retake_selection.add(temp_checkbok);
                         quiz_retake_selection_ids.add(r.getID() + separator + q.getID());
-                        student_form.add(temp_checkbok);
+                        student_form_panel.add(temp_checkbok);
                     }
                 }
 
                 line_break_label = new JLabel(" ");
-                student_form.add(line_break_label);
+                student_form_panel.add(line_break_label);
             }
             if (retakePrinted) {
                 retakePrinted = false;
@@ -331,19 +391,144 @@ public class quizschedule extends JFrame implements ActionListener{
 
 
     /**
-     * Method to populate master list of all quiz retake opportunities in .xml files
+     * Method to populate master list of all quiz retake opportunities in .xml file
      *
-     * @param retake_list JPanel where the quiz retakes list will be put
+     * @param retake_list_panel JPanel where the quiz retakes list will be put
      */
-    private void populate_retakes_list(JPanel retake_list){
+    private void populate_retakes_list(JPanel retake_list_panel){
         //creates a vertical box to allow for text to be stacked
-        Box box = Box.createVerticalBox();
+        Box list_box = Box.createVerticalBox();
         JLabel label;
-        for (retakeBean r : retakesList) {
-            label = new JLabel(r.toString());
-            box.add(label);
-            retake_list.add(box);
+        JPanel panel;
+        for (retakeBean retake : retakesList) {
+            label = new JLabel(retake.toString());
+            panel = new JPanel();
+            panel.setPreferredSize(new Dimension(350, 20));
+            panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            panel.add(label);
+            list_box.add(panel);
+            retake_list_panel.add(list_box);
         }
+    }
+
+
+    /**
+     * Method to build the view scheduled appointments form (asst3)
+     */
+    private void build_view_appointments_form(){
+        //clear former contents before building
+        view_appointments_form_panel = new JPanel();
+        view_appointments_form_panel.setPreferredSize(new Dimension(900, 700));
+        view_appointments_form_panel.setLayout(new BoxLayout(view_appointments_form_panel, BoxLayout.Y_AXIS));
+
+        //header and intro information
+        JLabel intro_label = new JLabel(String.format("GMU quiz retake appointments scheduled for class %s", course.getCourseTitle()));
+        intro_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        view_appointments_form_panel.add(intro_label);
+        JLabel line_break = new JLabel(" ");
+        view_appointments_form_panel.add(line_break);
+
+        //sort options for below list of appointments
+        Box sort_by_options_box = Box.createHorizontalBox();
+        JLabel sort_by_label = new JLabel("Sort By: ");
+        sort_by_options_box.add(sort_by_label);
+
+        JButton name_button = new JButton("Name");
+        name_button.setActionCommand("sort_appointments_by_namme");
+        name_button.addActionListener(this);
+        JButton quizID_button = new JButton("Quiz ID");
+        quizID_button.setActionCommand("sort_appointments_by_quizID");
+        quizID_button.addActionListener(this);
+        JButton retakeID_button = new JButton("Retake ID");
+        retakeID_button.setActionCommand("sort_appointments_by_retakeID");
+        retakeID_button.addActionListener(this);
+
+        sort_by_options_box.add(name_button);
+        sort_by_options_box.add(quizID_button);
+        sort_by_options_box.add(retakeID_button);
+
+        view_appointments_form_panel.add(sort_by_options_box);
+
+        //list of all scheduled quiz retake appointments
+        JLabel appointments_list_label = new JLabel("List of all scheduled quiz retakes:");
+        appointments_list_label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel appointment_list = new JPanel();
+        populate_appointments_list(appointment_list);
+        JScrollPane appointment_list_scroll_pane = new JScrollPane(appointment_list);
+        appointment_list_scroll_pane.setPreferredSize(new Dimension(800, 575));
+        appointment_list_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        appointment_list_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JPanel gui_center_panel = new JPanel();
+        gui_center_panel.setPreferredSize(new Dimension(800, 650));
+        gui_center_panel.add(appointments_list_label, BorderLayout.PAGE_START);
+        gui_center_panel.add(appointment_list_scroll_pane, BorderLayout.CENTER);
+
+        JPanel content_panel = new JPanel();
+        content_panel.setPreferredSize(new Dimension(800, 650));
+        content_panel.add(gui_center_panel);
+        view_appointments_form_panel.add(content_panel);
+
+        //bottom button panel
+        JButton close_button = new JButton("Close");
+        close_button.setActionCommand("close_form");
+        close_button.addActionListener(this);
+        close_button.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel bottom_button_panel = new JPanel();
+        bottom_button_panel.add(close_button, BorderLayout.CENTER);
+        view_appointments_form_panel.add(bottom_button_panel);
+    }
+
+
+    /**
+     * Method to populate master list of all scheduled quiz retake appointments in .txt file
+     *
+     * @param appointment_list_panel JPanel where the appointment list will be put
+     */
+    private void populate_appointments_list(JPanel appointment_list_panel){
+        //creates a vertical box to allow for text to be stacked
+        Box list_box = Box.createVerticalBox();
+
+        Box row_box = Box.createHorizontalBox();
+
+        JLabel label;
+        JPanel panel;
+
+        quizBean quiz;
+        retakeBean retake;
+        //String appointment_string;
+
+        for (apptBean appt : appointmentList){
+            quiz = quizList.getQuiz(appt.getQuizID());
+            retake = retakesList.getRetake(appt.getRetakeID());
+
+            label = new JLabel(appt.getName());
+            panel = new JPanel();
+            panel.setPreferredSize(new Dimension(150, 20));
+            panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            panel.add(label);
+            row_box.add(panel);
+
+            label = new JLabel(String.format("Quiz #%s", quiz.toString()));
+            panel = new JPanel();
+            panel.setPreferredSize(new Dimension(250, 20));
+            panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            panel.add(label);
+            row_box.add(panel);
+
+            label = new JLabel(String.format("Retake #%s", retake.toString()));
+            panel = new JPanel();
+            panel.setPreferredSize(new Dimension(350, 20));
+            panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            panel.add(label);
+            row_box.add(panel);
+
+            list_box.add(row_box);
+            row_box = Box.createHorizontalBox();
+        }
+        appointment_list_panel.add(list_box);
     }
 
 
@@ -362,13 +547,95 @@ public class quizschedule extends JFrame implements ActionListener{
                     System.out.format("Student Name: %s\n", student_name_input_field.getText());
                     System.out.format("Execute form submission function.\n");
                 }
-                submit_form();
+                submit_retake_selection_form();
                 break;
             case ("close_form"):
                 if(DEBUG){
-                    System.out.format("Close form button pressed\n");
+                    System.out.format("Close form button pressed.\n");
                 }
                 System.exit(0);
+                break;
+            case("show_schedule_retake_form"):
+                if(DEBUG){
+                    System.out.format("Show schedule retake form menu option selected.\n");
+                }
+                schedule_retake_form_panel.setVisible(false);
+                view_appointments_form_panel.setVisible(false);
+                get_data();
+                build_schedule_retake_form();
+                getContentPane().add(schedule_retake_form_panel, BorderLayout.CENTER);
+                schedule_retake_form_panel.setVisible(true);
+                break;
+            case("show_view_appointments_form"):
+                if(DEBUG){
+                    System.out.format("View appointments form menu option selected.\n");
+                }
+                view_appointments_form_panel.setVisible(false);
+                schedule_retake_form_panel.setVisible(false);
+                get_data();
+                build_view_appointments_form();
+                getContentPane().add(view_appointments_form_panel, BorderLayout.CENTER);
+                view_appointments_form_panel.setVisible(true);
+                break;
+            case("sort_appointments_by_namme"):
+                view_appointments_form_panel.setVisible(false);
+                if(appts_sort_by_name_toggle){
+                    if(DEBUG){
+                        System.out.format("Sorting appointments by name in alphabetical order.\n");
+                    }
+                    appointmentList.sortByNameAsc();
+                    appts_sort_by_name_toggle = false;
+                }
+                else{
+                    if(DEBUG){
+                        System.out.format("Sorting appointments by name in reverse alphabetical order.\n");
+                    }
+                    appointmentList.sortByNameDesc();
+                    appts_sort_by_name_toggle = true;
+                }
+                build_view_appointments_form();
+                getContentPane().add(view_appointments_form_panel, BorderLayout.CENTER);
+                view_appointments_form_panel.setVisible(true);
+                break;
+            case("sort_appointments_by_quizID"):
+                view_appointments_form_panel.setVisible(false);
+                if(appts_sort_by_quizID_toggle){
+                    if(DEBUG){
+                        System.out.format("Sorting appointments by quiz ID in order low to high.\n");
+                    }
+                    appointmentList.sortByQuizIDAsc();
+                    appts_sort_by_quizID_toggle = false;
+                }
+                else{
+                    if(DEBUG){
+                        System.out.format("Sorting appointments by quiz ID in order high to low.\n");
+                    }
+                    appointmentList.sortByQuizIDDesc();
+                    appts_sort_by_quizID_toggle = true;
+                }
+                build_view_appointments_form();
+                getContentPane().add(view_appointments_form_panel, BorderLayout.CENTER);
+                view_appointments_form_panel.setVisible(true);
+                break;
+            case("sort_appointments_by_retakeID"):
+                view_appointments_form_panel.setVisible(false);
+                if(appts_sort_by_retakeID_toggle){
+                    if(DEBUG){
+                        System.out.format("Sorting appointments by retake ID in order low to high.\n");
+                    }
+                    appointmentList.sortByRetakeIDAsc();
+                    appts_sort_by_retakeID_toggle = false;
+                }
+                else{
+                    if(DEBUG){
+                        System.out.format("Sorting appointments by retake ID in order high to low.\n");
+                    }
+                    appointmentList.sortByRetakeIDDesc();
+                    appts_sort_by_retakeID_toggle = true;
+                }
+                build_view_appointments_form();
+                getContentPane().add(view_appointments_form_panel, BorderLayout.CENTER);
+                view_appointments_form_panel.setVisible(true);
                 break;
             default:
                 if(DEBUG){
@@ -381,7 +648,7 @@ public class quizschedule extends JFrame implements ActionListener{
     /**
      * Saves selected appointments in a file and displays an acknowledgement
      */
-    private void submit_form(){
+    private void submit_retake_selection_form(){
         // No saving if IOException
         boolean IOerrFlag = false;
         String IOerrMessage = "";
@@ -431,6 +698,7 @@ public class quizschedule extends JFrame implements ActionListener{
                         System.out.format("%s\n", IOerrMessage);
                     }
                     alert_user(message);
+                    clear_retake_selection_form();
                 }
                 else {
                     String message = studentName + ", your appointments have been scheduled.\n" +
@@ -440,6 +708,7 @@ public class quizschedule extends JFrame implements ActionListener{
                         System.out.format("%s\n", IOerrMessage);
                     }
                     alert_user(message);
+                    clear_retake_selection_form();
                 }
             }
 
@@ -459,6 +728,19 @@ public class quizschedule extends JFrame implements ActionListener{
                 }
                 alert_user(message);
             }
+        }
+    }
+
+
+    /**
+     * Clears contents of retake selection form
+     */
+    private void clear_retake_selection_form(){
+        student_name_input_field.setText(""); //clear student name input
+
+        //traverse all checkboxes and uncheck them
+        for (JCheckBox ckbx : quiz_retake_selection) {
+            ckbx.setSelected(false);
         }
     }
 

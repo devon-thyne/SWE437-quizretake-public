@@ -7,52 +7,57 @@ import java.util.*;
  * This class holds a collection of quizzes
 
  * @author Jeff Offutt
+ * @author Devon Thyne - Edited 2019.02.12
  */
+public class quizzes implements Iterable<quizBean>{
 
-public class quizzes implements Iterable<quizBean>
-{
-   private ArrayList<quizBean> quizzes;
+    private ArrayList<quizBean> quizzes;
 
-   // ***** Constructors //
-   public quizzes ()
-   {
-      quizzes = new ArrayList<quizBean>();
-   }
+    // Constructors
+    public quizzes(){
+        quizzes = new ArrayList<quizBean>();
+    }
 
-   public quizzes (int quizID, int month, int day, int hour, int minute)
-   {  // Adds one quiz to a new list
-      quizzes = new ArrayList<quizBean>();
-      quizBean qb = new quizBean (quizID, month, day, hour, minute);
-      quizzes.add (qb);
-   }
+    public quizzes(int quizID, int month, int day, int hour, int minute){
+        // Adds one quiz to a new list
+        quizzes = new ArrayList<quizBean>();
+        quizBean qb = new quizBean(quizID, month, day, hour, minute);
+        quizzes.add (qb);
+    }
 
-   public quizzes (quizBean qb)
-   {
-      quizzes = new ArrayList<quizBean>();
-      quizzes.add (qb);
-   }
+    public quizzes(quizBean qb){
+        quizzes = new ArrayList<quizBean>();
+        quizzes.add (qb);
+    }
 
-   // *** sorting and iterating *** //
-   public void sort ()
-   {
-      Collections.sort (quizzes);
-   }
 
-   @Override
-   public Iterator<quizBean> iterator()
-   {
-       return quizzes.iterator();
-   }
+    // sorting and iterating
+    public void sort(){
+        Collections.sort(quizzes);
+    }
 
-   // ***** setters & getters //
-   public void addQuiz (quizBean qb)
-   {
-      quizzes.add (qb);
-   }
+    @Override
+    public Iterator<quizBean> iterator(){
+        return quizzes.iterator();
+    }
 
-   public String toString ()
-   {
-      return (Arrays.toString(quizzes.toArray()));
-   }
+
+    // setters & getters
+    public void addQuiz(quizBean qb){
+        quizzes.add (qb);
+    }
+
+    public quizBean getQuiz(int quizID){
+        for(quizBean q: quizzes){
+            if(q.getID() == quizID){
+                return q;
+            }
+        }
+        return null;
+    }
+
+    public String toString(){
+        return (Arrays.toString(quizzes.toArray()));
+    }
 
 }

@@ -86,10 +86,4 @@ public class quizBean implements Comparable<quizBean>
       return timeGiven.toString();
    }
 
-/*
-   public String getQuizId() {
-      return quizId;
-   }
-*/
-
 }

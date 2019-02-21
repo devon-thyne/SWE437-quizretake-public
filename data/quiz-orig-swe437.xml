@@ -23,4 +23,34 @@
 
 <!-- ... add remaining quizzes below -->
 
+  <quiz>
+    <id>3</id>
+    <dateGiven>
+      <month>2</month>
+      <day>12</day>
+      <hour>10</hour>
+      <minute>30</minute>
+    </dateGiven>
+  </quiz>
+
+  <quiz>
+    <id>4</id>
+    <dateGiven>
+      <month>2</month>
+      <day>19</day>
+      <hour>10</hour>
+      <minute>30</minute>
+    </dateGiven>
+  </quiz>
+
+  <quiz>
+    <id>5</id>
+    <dateGiven>
+      <month>2</month>
+      <day>26</day>
+      <hour>10</hour>
+      <minute>30</minute>
+    </dateGiven>
+  </quiz>
+
 </quizzes>
