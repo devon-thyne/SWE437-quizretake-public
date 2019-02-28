@@ -222,6 +222,140 @@
     </dateGiven>
   </retake>
 
-<!--Still need to add retakes 20 - 39-->
+  <retake>
+    <id>20</id>
+    <location>EB 5321</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>3</month> <!-- 01..12 -->
+      <day>26</day> <!-- 1..31 -->
+      <hour>15</hour> <!-- 0..23 -->
+      <minute>00</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>21</id>
+    <location>EB 4430</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>3</month> <!-- 01..12 -->
+      <day>27</day> <!-- 1..31 -->
+      <hour>15</hour> <!-- 0..23 -->
+      <minute>30</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>22</id>
+    <location>Buchanan Hall D002</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>3</month> <!-- 01..12 -->
+      <day>28</day> <!-- 1..31 -->
+      <hour>10</hour> <!-- 0..23 -->
+      <minute>00</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>23</id>
+    <location>EB 5321</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>2</day> <!-- 1..31 -->
+      <hour>15</hour> <!-- 0..23 -->
+      <minute>00</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>24</id>
+    <location>EB 4430</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>3</day> <!-- 1..31 -->
+      <hour>15</hour> <!-- 0..23 -->
+      <minute>30</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>25</id>
+    <location>Buchanan Hall D002</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>4</day> <!-- 1..31 -->
+      <hour>10</hour> <!-- 0..23 -->
+      <minute>00</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>26</id>
+    <location>EB 5321</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>9</day> <!-- 1..31 -->
+      <hour>15</hour> <!-- 0..23 -->
+      <minute>00</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>27</id>
+    <location>EB 4430</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>10</day> <!-- 1..31 -->
+      <hour>15</hour> <!-- 0..23 -->
+      <minute>30</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>28</id>
+    <location>Buchanan Hall D002</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>11</day> <!-- 1..31 -->
+      <hour>10</hour> <!-- 0..23 -->
+      <minute>00</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>29</id>
+    <location>EB 5321</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>16</day> <!-- 1..31 -->
+      <hour>15</hour> <!-- 0..23 -->
+      <minute>00</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>30</id>
+    <location>EB 4430</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>17</day> <!-- 1..31 -->
+      <hour>15</hour> <!-- 0..23 -->
+      <minute>30</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+  <retake>
+    <id>31</id>
+    <location>Buchanan Hall D002</location> <!-- TA's office hours -->
+    <dateGiven> <!-- Same format as in quizzes.xml -->
+      <month>4</month> <!-- 01..12 -->
+      <day>18</day> <!-- 1..31 -->
+      <hour>10</hour> <!-- 0..23 -->
+      <minute>00</minute> <!--  0-59 -->
+    </dateGiven>
+  </retake>
+
+
+
+
 
 </retakes>
