@@ -1,136 +1,120 @@
-<?xml version = "1.0" encoding = "UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <quizzes>
-
-  <quiz>
-    <id>1</id> <!-- integer > 0 -->
-    <dateGiven>
-      <month>1</month> <!-- 1..12 -->
-      <day>29</day> <!-- 1..31 -->
-      <hour>10</hour> <!-- 0..23 -->
-      <minute>30</minute> <!-- 0-59 -->
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>2</id>
-    <dateGiven>
-      <month>2</month>
-      <day>5</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-<!-- ... add remaining quizzes below -->
-
-  <quiz>
-    <id>3</id>
-    <dateGiven>
-      <month>2</month>
-      <day>12</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>4</id>
-    <dateGiven>
-      <month>2</month>
-      <day>19</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>5</id>
-    <dateGiven>
-      <month>2</month>
-      <day>26</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>6</id>
-    <dateGiven>
-      <month>3</month>
-      <day>5</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>7</id>
-    <dateGiven>
-      <month>3</month>
-      <day>19</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>8</id>
-    <dateGiven>
-      <month>3</month>
-      <day>26</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>9</id>
-    <dateGiven>
-      <month>4</month>
-      <day>2</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>10</id>
-    <dateGiven>
-      <month>4</month>
-      <day>9</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>11</id>
-    <dateGiven>
-      <month>4</month>
-      <day>16</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>12</id>
-    <dateGiven>
-      <month>4</month>
-      <day>23</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
-  <quiz>
-    <id>13</id>
-    <dateGiven>
-      <month>4</month>
-      <day>30</day>
-      <hour>10</hour>
-      <minute>30</minute>
-    </dateGiven>
-  </quiz>
-
+    <quiz>
+        <id>1</id>
+        <dateGiven>
+            <month>1</month>
+            <day>29</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>2</id>
+        <dateGiven>
+            <month>2</month>
+            <day>5</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>3</id>
+        <dateGiven>
+            <month>2</month>
+            <day>12</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>4</id>
+        <dateGiven>
+            <month>2</month>
+            <day>19</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>5</id>
+        <dateGiven>
+            <month>2</month>
+            <day>26</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>6</id>
+        <dateGiven>
+            <month>3</month>
+            <day>5</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>7</id>
+        <dateGiven>
+            <month>3</month>
+            <day>19</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>8</id>
+        <dateGiven>
+            <month>3</month>
+            <day>26</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>9</id>
+        <dateGiven>
+            <month>4</month>
+            <day>2</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>10</id>
+        <dateGiven>
+            <month>4</month>
+            <day>9</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>11</id>
+        <dateGiven>
+            <month>4</month>
+            <day>16</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>12</id>
+        <dateGiven>
+            <month>4</month>
+            <day>23</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>13</id>
+        <dateGiven>
+            <month>4</month>
+            <day>30</day>
+            <hour>10</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
 </quizzes>

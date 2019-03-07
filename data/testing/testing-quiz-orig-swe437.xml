@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<quizzes>
+    <quiz>
+        <id>1</id>
+        <dateGiven>
+            <month>3</month>
+            <day>6</day>
+            <hour>2</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+    <quiz>
+        <id>2</id>
+        <dateGiven>
+            <month>3</month>
+            <day>7</day>
+            <hour>2</hour>
+            <minute>30</minute>
+        </dateGiven>
+    </quiz>
+</quizzes>

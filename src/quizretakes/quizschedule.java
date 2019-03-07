@@ -1,5 +1,7 @@
 package quizretakes;
 
+import quizretakes.exceptions.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -73,7 +75,20 @@ public class quizschedule extends JFrame implements ActionListener{
     //critical GUI components and gathered information
     private JPanel schedule_retake_form_panel;
     private JPanel view_appointments_form_panel;
+    private JPanel view_quiz_create_panel;
+    private JPanel view_retake_create_panel;
     private JTextField student_name_input_field;
+    private JTextField quiz_id_input_field;
+    private JTextField quiz_month_input_field;
+    private JTextField quiz_day_input_field;
+    private JTextField quiz_hour_input_field;
+    private JTextField quiz_minute_input_field;
+    private JTextField retake_id_input_field;
+    private JTextField retake_location_input_field;
+    private JTextField retake_month_input_field;
+    private JTextField retake_day_input_field;
+    private JTextField retake_hour_input_field;
+    private JTextField retake_minute_input_field;
     private ArrayList<JCheckBox> quiz_retake_selection;
     private ArrayList<String> quiz_retake_selection_ids;
     private boolean appts_sort_by_name_toggle = true;
@@ -109,7 +124,6 @@ public class quizschedule extends JFrame implements ActionListener{
         //build menu bar for GUI
         JMenuBar menu_bar = new JMenuBar();
 
-
         //Form options toggle between different program functionality
         JMenu form_options_menu = new JMenu("Form Options");
 
@@ -121,8 +135,18 @@ public class quizschedule extends JFrame implements ActionListener{
         view_appointments_form.setActionCommand("show_view_appointments_form");
         view_appointments_form.addActionListener(this);
 
+        JMenuItem create_quiz_form = new JMenuItem("Create New Quizzes");
+        create_quiz_form.setActionCommand("show_create_quiz_form");
+        create_quiz_form.addActionListener(this);
+
+        JMenuItem create_retakes_form = new JMenuItem("Create New Retake");
+        create_retakes_form.setActionCommand("show_create_retake_form");
+        create_retakes_form.addActionListener(this);
+
         form_options_menu.add(schedule_retake_form);
         form_options_menu.add(view_appointments_form);
+        form_options_menu.add(create_quiz_form);
+        form_options_menu.add(create_retakes_form);
 
         menu_bar.add(form_options_menu);
         setJMenuBar(menu_bar);
@@ -135,6 +159,14 @@ public class quizschedule extends JFrame implements ActionListener{
         view_appointments_form_panel = new JPanel();
         view_appointments_form_panel.setPreferredSize(new Dimension(1000, 750));
         build_view_appointments_form();
+
+        view_quiz_create_panel = new JPanel();
+        view_quiz_create_panel.setPreferredSize(new Dimension(1000,750));
+        build_quiz_create_form();
+
+        view_retake_create_panel = new JPanel();
+        view_retake_create_panel.setPreferredSize(new Dimension(1000,750));
+        build_retake_create_form();
 
         getContentPane().add(schedule_retake_form_panel, BorderLayout.CENTER);
     }
@@ -336,7 +368,7 @@ public class quizschedule extends JFrame implements ActionListener{
         student_form_panel.add(form_output_label);
 
         student_name_input_field = new JTextField();
-        student_name_input_field.setMaximumSize(new Dimension(500, 30));
+        student_name_input_field.setMaximumSize(new Dimension(500, 25));
         student_form_panel.add(student_name_input_field);
 
         line_break_label = new JLabel(" ");
@@ -456,17 +488,17 @@ public class quizschedule extends JFrame implements ActionListener{
         JPanel appointment_list = new JPanel();
         populate_appointments_list(appointment_list);
         JScrollPane appointment_list_scroll_pane = new JScrollPane(appointment_list);
-        appointment_list_scroll_pane.setPreferredSize(new Dimension(800, 575));
+        appointment_list_scroll_pane.setPreferredSize(new Dimension(875, 575));
         appointment_list_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         appointment_list_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         JPanel gui_center_panel = new JPanel();
-        gui_center_panel.setPreferredSize(new Dimension(800, 650));
+        gui_center_panel.setPreferredSize(new Dimension(875, 650));
         gui_center_panel.add(appointments_list_label, BorderLayout.PAGE_START);
         gui_center_panel.add(appointment_list_scroll_pane, BorderLayout.CENTER);
 
         JPanel content_panel = new JPanel();
-        content_panel.setPreferredSize(new Dimension(800, 650));
+        content_panel.setPreferredSize(new Dimension(875, 650));
         content_panel.add(gui_center_panel);
         view_appointments_form_panel.add(content_panel);
 
@@ -506,21 +538,21 @@ public class quizschedule extends JFrame implements ActionListener{
 
             label = new JLabel(appt.getName());
             panel = new JPanel();
-            panel.setPreferredSize(new Dimension(150, 20));
+            panel.setPreferredSize(new Dimension(175, 20));
             panel.setLayout(new FlowLayout(FlowLayout.LEFT));
             panel.add(label);
             row_box.add(panel);
 
             label = new JLabel(String.format("Quiz #%s", quiz.toString()));
             panel = new JPanel();
-            panel.setPreferredSize(new Dimension(250, 20));
+            panel.setPreferredSize(new Dimension(275, 20));
             panel.setLayout(new FlowLayout(FlowLayout.LEFT));
             panel.add(label);
             row_box.add(panel);
 
             label = new JLabel(String.format("Retake #%s", retake.toString()));
             panel = new JPanel();
-            panel.setPreferredSize(new Dimension(350, 20));
+            panel.setPreferredSize(new Dimension(375, 20));
             panel.setLayout(new FlowLayout(FlowLayout.LEFT));
             panel.add(label);
             row_box.add(panel);
@@ -529,6 +561,312 @@ public class quizschedule extends JFrame implements ActionListener{
             row_box = Box.createHorizontalBox();
         }
         appointment_list_panel.add(list_box);
+    }
+
+
+    /**
+     * Method creates a form for instructors to create quizzes
+     */
+    public void build_quiz_create_form(){
+        //clear former contents before building
+        view_quiz_create_panel = new JPanel();
+
+        //header and intro information
+        JLabel intro_label = new JLabel(String.format("Create quizzes for %s", course.getCourseTitle()));
+        intro_label.setHorizontalAlignment(SwingConstants.CENTER);
+        view_quiz_create_panel.add(intro_label,BorderLayout.PAGE_START);
+
+        //instructor create new quiz form
+        JLabel create_quizzes_label = new JLabel("Create New Quiz Form");
+        create_quizzes_label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel quiz_create_form = new JPanel();
+        populate_create_quiz_form(quiz_create_form);
+        JScrollPane create_quiz_scroll_pane = new JScrollPane(quiz_create_form);
+        create_quiz_scroll_pane.setPreferredSize(new Dimension(400, 625));
+        create_quiz_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        create_quiz_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JPanel gui_left_panel = new JPanel();
+        gui_left_panel.setPreferredSize(new Dimension(500,650));
+        gui_left_panel.add(create_quizzes_label, BorderLayout.PAGE_START);
+        gui_left_panel.add(create_quiz_scroll_pane, BorderLayout.CENTER);
+
+        //list of all quizzes
+        JLabel quizzes_created_label = new JLabel("Quizzes Already Scheduled");
+        quizzes_created_label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel quiz_list = new JPanel();
+        populate_quizzes_list(quiz_list);
+        JScrollPane quiz_list_scroll_pane = new JScrollPane(quiz_list);
+        quiz_list_scroll_pane.setPreferredSize(new Dimension(400,625));
+        quiz_list_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        quiz_list_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JPanel gui_right_panel = new JPanel();
+        gui_right_panel.setPreferredSize(new Dimension(500,650));
+        gui_right_panel.add(quizzes_created_label, BorderLayout.PAGE_START);
+        gui_right_panel.add(quiz_list_scroll_pane, BorderLayout.CENTER);
+
+        //split content of GUI horizontally
+        JPanel content_panel = new JPanel();
+        content_panel.setLayout(new GridLayout(1, 2));
+        content_panel.add(gui_left_panel);
+        content_panel.add(gui_right_panel);
+        view_quiz_create_panel.add(content_panel);
+
+        //bottom button panel
+        JButton submit_button = new JButton("Submit");
+        submit_button.setActionCommand("create_quiz");
+        submit_button.addActionListener(this);
+        submit_button.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JButton close_button = new JButton("Close");
+        close_button.setActionCommand("close_form");
+        close_button.addActionListener(this);
+        close_button.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel bottom_button_panel = new JPanel();
+        bottom_button_panel.add(submit_button, BorderLayout.CENTER);
+        bottom_button_panel.add(close_button, BorderLayout.CENTER);
+        view_quiz_create_panel.add(bottom_button_panel, BorderLayout.PAGE_END);
+    }
+
+
+    /**
+     * Method to populate contents of instructor quiz creation form
+     *
+     * @param quiz_create_form_panel JPanel where the quiz creation form will be put
+     */
+    private void populate_create_quiz_form(JPanel quiz_create_form_panel){
+        //set BoxLayout so each item can be placed below the next
+        quiz_create_form_panel.setLayout(new BoxLayout(quiz_create_form_panel, BoxLayout.Y_AXIS));
+
+        JLabel form_output_label;
+        JLabel line_break_label;
+
+        //form_output_label = new JLabel("You can sign up for quiz retakes within the next two weeks.");
+        form_output_label = new JLabel("All form inputs are required.");
+        quiz_create_form_panel.add(form_output_label);
+
+        line_break_label = new JLabel(" ");
+        quiz_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Quiz ID:");
+        quiz_create_form_panel.add(form_output_label);
+
+        quiz_id_input_field = new JTextField();
+        quiz_id_input_field.setMaximumSize(new Dimension(100, 25));
+        quiz_create_form_panel.add(quiz_id_input_field);
+
+        line_break_label = new JLabel(" ");
+        quiz_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Month (MM):");
+        quiz_create_form_panel.add(form_output_label);
+
+        quiz_month_input_field = new JTextField();
+        quiz_month_input_field.setMaximumSize(new Dimension(100, 30));
+        quiz_create_form_panel.add(quiz_month_input_field);
+
+        line_break_label = new JLabel(" ");
+        quiz_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Day (DD):");
+        quiz_create_form_panel.add(form_output_label);
+
+        quiz_day_input_field = new JTextField();
+        quiz_day_input_field.setMaximumSize(new Dimension(100, 30));
+        quiz_create_form_panel.add(quiz_day_input_field);
+
+        line_break_label = new JLabel(" ");
+        quiz_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Hour (hh):");
+        quiz_create_form_panel.add(form_output_label);
+
+        quiz_hour_input_field = new JTextField();
+        quiz_hour_input_field.setMaximumSize(new Dimension(100, 25));
+        quiz_create_form_panel.add(quiz_hour_input_field);
+
+        line_break_label = new JLabel(" ");
+        quiz_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Minute (mm):");
+        quiz_create_form_panel.add(form_output_label);
+
+        quiz_minute_input_field = new JTextField();
+        quiz_minute_input_field.setMaximumSize(new Dimension(100, 25));
+        quiz_create_form_panel.add(quiz_minute_input_field);
+    }
+
+
+    /**
+     * Method to populate master list of all quizzes in .xml file
+     *
+     * @param quiz_list_panel JPanel where the quiz retakes list will be put
+     */
+    private void populate_quizzes_list(JPanel quiz_list_panel){
+        //creates a vertical box to allow for text to be stacked
+        Box list_box = Box.createVerticalBox();
+        JLabel label;
+        JPanel panel;
+        for (quizBean quiz : quizList) {
+            label = new JLabel(quiz.toString());
+            panel = new JPanel();
+            panel.setPreferredSize(new Dimension(350, 20));
+            panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            panel.add(label);
+            list_box.add(panel);
+            quiz_list_panel.add(list_box);
+        }
+    }
+
+
+    /**
+     * Method creates the form for an instructor to create retakes as needed
+     */
+    public void build_retake_create_form(){
+        //clear former contents before building
+        view_retake_create_panel = new JPanel();
+
+        //header and intro information
+        JLabel intro_label = new JLabel(String.format("Create retakes for %s", course.getCourseTitle()));
+        intro_label.setHorizontalAlignment(SwingConstants.CENTER);
+        view_retake_create_panel.add(intro_label,BorderLayout.PAGE_START);
+
+        //instructor create new quiz form
+        JLabel create_retakes_label = new JLabel("Create New Retake Form");
+        create_retakes_label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel retake_create_form = new JPanel();
+        populate_create_retake_form(retake_create_form);
+        JScrollPane create_retake_scroll_pane = new JScrollPane(retake_create_form);
+        create_retake_scroll_pane.setPreferredSize(new Dimension(400, 625));
+        create_retake_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        create_retake_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JPanel gui_left_panel = new JPanel();
+        gui_left_panel.setPreferredSize(new Dimension(500,650));
+        gui_left_panel.add(create_retakes_label, BorderLayout.PAGE_START);
+        gui_left_panel.add(create_retake_scroll_pane, BorderLayout.CENTER);
+
+        //list of all retakes
+        JLabel retakes_created_label = new JLabel("Retakes Already Scheduled");
+        retakes_created_label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel retakes_list = new JPanel();
+        populate_retakes_list(retakes_list);
+        JScrollPane retakes_created_scroll_pane = new JScrollPane(retakes_list);
+        retakes_created_scroll_pane.setPreferredSize(new Dimension(400,625));
+        retakes_created_scroll_pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        retakes_created_scroll_pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JPanel gui_right_panel = new JPanel();
+        gui_right_panel.setPreferredSize(new Dimension(500,650));
+        gui_right_panel.add(retakes_created_label, BorderLayout.PAGE_START);
+        gui_right_panel.add(retakes_created_scroll_pane, BorderLayout.CENTER);
+
+        //split content of GUI horizontally
+        JPanel content_panel = new JPanel();
+        content_panel.setLayout(new GridLayout(1, 2));
+        content_panel.add(gui_left_panel);
+        content_panel.add(gui_right_panel);
+        view_retake_create_panel.add(content_panel);
+
+        //bottom button panel
+        JButton submit_button = new JButton("Submit");
+        submit_button.setActionCommand("create_retake");
+        submit_button.addActionListener(this);
+        submit_button.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JButton close_button = new JButton("Close");
+        close_button.setActionCommand("close_form");
+        close_button.addActionListener(this);
+        close_button.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel bottom_button_panel = new JPanel();
+        bottom_button_panel.add(submit_button, BorderLayout.CENTER);
+        bottom_button_panel.add(close_button, BorderLayout.CENTER);
+        view_retake_create_panel.add(bottom_button_panel, BorderLayout.PAGE_END);
+    }
+
+
+    /**
+     * Method to populate contents of instructor retake creation form
+     *
+     * @param retake_create_form_panel JPanel where the quiz creation form will be put
+     */
+    private void populate_create_retake_form(JPanel retake_create_form_panel){
+        //set BoxLayout so each item can be placed below the next
+        retake_create_form_panel.setLayout(new BoxLayout(retake_create_form_panel, BoxLayout.Y_AXIS));
+
+        JLabel form_output_label;
+        JLabel line_break_label;
+
+        //form_output_label = new JLabel("You can sign up for quiz retakes within the next two weeks.");
+        form_output_label = new JLabel("All form inputs are required.");
+        retake_create_form_panel.add(form_output_label);
+
+        line_break_label = new JLabel(" ");
+        retake_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Retake ID:");
+        retake_create_form_panel.add(form_output_label);
+
+        retake_id_input_field = new JTextField();
+        retake_id_input_field.setMaximumSize(new Dimension(100, 25));
+        retake_create_form_panel.add(retake_id_input_field);
+
+        line_break_label = new JLabel(" ");
+        retake_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Location:");
+        retake_create_form_panel.add(form_output_label);
+
+        retake_location_input_field = new JTextField();
+        retake_location_input_field.setMaximumSize(new Dimension(400, 25));
+        retake_create_form_panel.add(retake_location_input_field);
+
+        line_break_label = new JLabel(" ");
+        retake_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Month (MM):");
+        retake_create_form_panel.add(form_output_label);
+
+        retake_month_input_field = new JTextField();
+        retake_month_input_field.setMaximumSize(new Dimension(100, 30));
+        retake_create_form_panel.add(retake_month_input_field);
+
+        line_break_label = new JLabel(" ");
+        retake_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Day (DD):");
+        retake_create_form_panel.add(form_output_label);
+
+        retake_day_input_field = new JTextField();
+        retake_day_input_field.setMaximumSize(new Dimension(100, 30));
+        retake_create_form_panel.add(retake_day_input_field);
+
+        line_break_label = new JLabel(" ");
+        retake_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Hour (hh):");
+        retake_create_form_panel.add(form_output_label);
+
+        retake_hour_input_field = new JTextField();
+        retake_hour_input_field.setMaximumSize(new Dimension(100, 25));
+        retake_create_form_panel.add(retake_hour_input_field);
+
+        line_break_label = new JLabel(" ");
+        retake_create_form_panel.add(line_break_label);
+
+        form_output_label = new JLabel("Minute (mm):");
+        retake_create_form_panel.add(form_output_label);
+
+        retake_minute_input_field = new JTextField();
+        retake_minute_input_field.setMaximumSize(new Dimension(100, 25));
+        retake_create_form_panel.add(retake_minute_input_field);
     }
 
 
@@ -545,9 +883,22 @@ public class quizschedule extends JFrame implements ActionListener{
                 if(DEBUG){
                     System.out.format("Student form submit button pressed.\n");
                     System.out.format("Student Name: %s\n", student_name_input_field.getText());
-                    System.out.format("Execute form submission function.\n");
                 }
                 submit_retake_selection_form();
+                break;
+            case("create_quiz"):
+                if(DEBUG){
+                    System.out.format("Create quiz form submit button pressed.\n");
+                    System.out.format("Quiz ID: %s, Date: %s/%s, Time: %s:%s\n", quiz_id_input_field.getText(), quiz_month_input_field.getText(), quiz_day_input_field.getText(), quiz_hour_input_field.getText(), quiz_minute_input_field.getText());
+                }
+                submit_create_quiz_form();
+                break;
+            case("create_retake"):
+                if(DEBUG){
+                    System.out.format("Create retake form submit button pressed.\n");
+                    System.out.format("Retake ID: %s, Location: %s, Date: %s/%s, Time: %s:%s\n", retake_id_input_field.getText(), retake_location_input_field.getText(), retake_month_input_field.getText(), retake_day_input_field.getText(), retake_hour_input_field.getText(), retake_minute_input_field.getText());
+                }
+                submit_create_retake_form();
                 break;
             case ("close_form"):
                 if(DEBUG){
@@ -559,8 +910,7 @@ public class quizschedule extends JFrame implements ActionListener{
                 if(DEBUG){
                     System.out.format("Show schedule retake form menu option selected.\n");
                 }
-                schedule_retake_form_panel.setVisible(false);
-                view_appointments_form_panel.setVisible(false);
+                hide_gui_forms();
                 get_data();
                 build_schedule_retake_form();
                 getContentPane().add(schedule_retake_form_panel, BorderLayout.CENTER);
@@ -570,12 +920,31 @@ public class quizschedule extends JFrame implements ActionListener{
                 if(DEBUG){
                     System.out.format("View appointments form menu option selected.\n");
                 }
-                view_appointments_form_panel.setVisible(false);
-                schedule_retake_form_panel.setVisible(false);
+                hide_gui_forms();
                 get_data();
                 build_view_appointments_form();
                 getContentPane().add(view_appointments_form_panel, BorderLayout.CENTER);
                 view_appointments_form_panel.setVisible(true);
+                break;
+            case("show_create_quiz_form"):
+                if(DEBUG){
+                    System.out.format("Create quizzes form menu option selected.\n");
+                }
+                hide_gui_forms();
+                get_data();
+                build_quiz_create_form();
+                getContentPane().add(view_quiz_create_panel,BorderLayout.CENTER);
+                view_quiz_create_panel.setVisible(true);
+                break;
+            case("show_create_retake_form"):
+                if(DEBUG){
+                    System.out.format("Create retakes form menu option selected.\n");
+                }
+                hide_gui_forms();
+                get_data();
+                build_retake_create_form();
+                getContentPane().add(view_retake_create_panel, BorderLayout.CENTER);
+                view_retake_create_panel.setVisible(true);
                 break;
             case("sort_appointments_by_namme"):
                 view_appointments_form_panel.setVisible(false);
@@ -642,6 +1011,17 @@ public class quizschedule extends JFrame implements ActionListener{
                     System.out.format("User performed unsupported action: '%s'\n", action);
                 }
         }
+    }
+
+
+    /**
+     * Helper method to automatically hide all GUI forms so that the GUI can be refreshed with new contents when showing new form
+     */
+    private void hide_gui_forms(){
+        schedule_retake_form_panel.setVisible(false);
+        view_appointments_form_panel.setVisible(false);
+        view_quiz_create_panel.setVisible(false);
+        view_retake_create_panel.setVisible(false);
     }
 
 
@@ -742,6 +1122,383 @@ public class quizschedule extends JFrame implements ActionListener{
         for (JCheckBox ckbx : quiz_retake_selection) {
             ckbx.setSelected(false);
         }
+    }
+
+
+    /**
+     * Saves inputted quiz to file and displays an acknowledgement
+     */
+    private void submit_create_quiz_form(){
+        quizBean new_quiz;
+        try{
+            new_quiz = create_new_quiz_from_form(quiz_id_input_field, quiz_month_input_field, quiz_day_input_field, quiz_hour_input_field, quiz_minute_input_field);
+            add_new_quiz(new_quiz);
+            alert_user(String.format("Quiz #%d added successfully.", new_quiz.getID()));
+        }
+        catch (Exception e){
+            alert_user(e.getMessage());
+            return;
+        }
+        hide_gui_forms();
+        get_data();
+        build_quiz_create_form();
+        getContentPane().add(view_quiz_create_panel,BorderLayout.CENTER);
+        view_quiz_create_panel.setVisible(true);
+    }
+
+
+    /**
+     * Creates a new quizBean object from user input fields
+     *
+     * @param quiz_id_input JTextField component where quiz id attribute is entered
+     * @param quiz_month_input JTextField component where quiz month attribute is entered
+     * @param quiz_day_input JTextField component where quiz day attribute is entered
+     * @param quiz_hour_input JTextField component where quiz hour attribute is entered
+     * @param quiz_minute_input JTextField component where quiz minute attribute is entered
+     * @return quizBean object instance constructed with inputted values to JTextField components
+     */
+    private quizBean create_new_quiz_from_form(JTextField quiz_id_input, JTextField quiz_month_input, JTextField quiz_day_input, JTextField quiz_hour_input, JTextField quiz_minute_input) throws Exception {
+        quizBean new_quiz;
+
+        int quiz_id;
+        int month;
+        int day;
+        int hour;
+        int minute;
+
+        //checking ID
+        if(quiz_id_input.getText().equals("")){
+            throw new InvalidIdException("Quiz id cannot be null");
+        }
+        else if(quiz_id_input.getText().equals("0")){
+            throw new InvalidIdException("Quiz id cannot be zero");
+        }
+        else{
+            try {
+                quiz_id = Integer.parseInt(quiz_id_input.getText());
+            }
+            catch (Exception e){
+                throw new InvalidIdException("Quiz id invalid");
+            }
+            if(quiz_id < 0){
+                throw new InvalidIdException("Quiz id cannot be a negative number");
+            }
+        }
+
+        //checking month
+        if(quiz_month_input.getText().equals("")){
+            throw new InvalidTimeException("Quiz month cannot be null");
+        }
+        else if(quiz_month_input.getText().equals("0")){
+            throw new InvalidTimeException("Quiz month cannot be zero");
+        }
+        else{
+            try {
+                month = Integer.parseInt(quiz_month_input.getText());
+            }
+            catch (Exception e){
+                throw new InvalidIdException("Quiz month invalid");
+            }
+            if(month < 0){
+                throw new InvalidTimeException("Quiz month invalid");
+            }
+            else if(month > 12){
+                throw new InvalidTimeException("Quiz month invalid");
+            }
+        }
+
+        //checking day
+        if(quiz_day_input.getText().equals("")){
+            throw new InvalidTimeException("Quiz day cannot be null");
+        }
+        else if (quiz_day_input.getText().equals("0")){
+            throw new InvalidTimeException("Quiz day cannot be zero");
+        }
+        else{
+            try {
+                day = Integer.parseInt(quiz_day_input.getText());
+            }
+            catch (Exception e){
+                throw new InvalidIdException("Quiz day invalid");
+            }
+            if(day < 0){
+                throw new InvalidTimeException("Quiz day invalid");
+            }
+            else{
+                LocalDate test_date;
+                try {
+                    //to test for skip day and legal month day
+                    test_date = LocalDate.of(2019, month, day);
+                }
+                catch(Exception e){
+                    throw new InvalidTimeException("Quiz day invalid");
+                }
+
+                if(test_date.getDayOfWeek().equals(DayOfWeek.SATURDAY) || test_date.getDayOfWeek().equals(DayOfWeek.SUNDAY)){
+                    throw new InvalidTimeException("Quiz cannot be scheduled on a weekend");
+                }
+                else if((!(test_date.isBefore(course.getStartSkip())) && !(test_date.isAfter(course.getEndSkip()))) || test_date.isEqual(course.getStartSkip()) || test_date.isEqual(course.getEndSkip())){
+                    throw new InvalidTimeException("Quiz cannot be scheduled during course skip week");
+                }
+            }
+        }
+
+        //checking hour
+        if(quiz_hour_input.getText().equals("")){
+            throw new InvalidTimeException("Quiz hour cannot be null");
+        }
+        else{
+            try {
+                hour = Integer.parseInt(quiz_hour_input.getText());
+            }
+            catch(Exception e){
+                throw new InvalidIdException("Quiz hour invalid");
+            }
+            if(hour < 0){
+                throw new InvalidTimeException("Quiz hour invalid");
+            }
+            else if(hour > 23){
+                throw new InvalidTimeException("Quiz hour invalid");
+            }
+        }
+
+        //checking minute
+        if(quiz_minute_input.getText().equals("")){
+            throw new InvalidTimeException("Quiz minute cannot be null");
+        }
+        else{
+            try {
+                minute = Integer.parseInt(quiz_minute_input.getText());
+            }
+            catch (Exception e){
+                throw new InvalidIdException("Quiz minute invalid");
+            }
+            if(minute < 0){
+                throw new InvalidTimeException("Quiz minute invalid");
+
+            }
+            else if(minute > 59){
+                throw new InvalidTimeException("Quiz minute invalid");
+
+            }
+        }
+
+        new_quiz = new quizBean(quiz_id,month,day,hour,minute);
+        return new_quiz;
+    }
+
+
+    /**
+     * Method screens new quiz object against current list of quizzes and adds it and writes it to .xml file if valid
+     *
+     * @param new_quiz quizBean object to be added
+     */
+    private void add_new_quiz(quizBean new_quiz) throws Exception {
+        //traverse existing quiz list to validate new_quiz before adding it to the list
+        for(quizBean quiz : quizList){
+            if(quiz.getID() == new_quiz.getID()){
+                throw new InvalidQuizException("Cannot have duplicate quiz id's");
+            }
+            if(quiz.dateAsString().equals(new_quiz.dateAsString()) && quiz.timeAsString().equals(new_quiz.timeAsString())){
+                throw new InvalidQuizException("Cannot have two quizzes on the same date");
+            }
+        }
+
+        //if traversal successful, attempt to add new quiz to data file using writer class
+        quizList.addQuiz(new_quiz);
+        quizWriter qw = new quizWriter();
+        qw.write(quizzesFileName, quizList);
+    }
+
+
+    /**
+     * Saves inputted retake to file and displays an acknowledgement
+     */
+    private void submit_create_retake_form(){
+        retakeBean new_retake;
+        try{
+            new_retake = create_new_retake_from_form(retake_id_input_field, retake_location_input_field, retake_month_input_field, retake_day_input_field, retake_hour_input_field, retake_minute_input_field);
+            add_new_retake(new_retake);
+            alert_user(String.format("Retake #%d added successfully.", new_retake.getID()));
+        }
+        catch (Exception e){
+            alert_user(e.getMessage());
+            return;
+        }
+        hide_gui_forms();
+        get_data();
+        build_retake_create_form();
+        getContentPane().add(view_retake_create_panel,BorderLayout.CENTER);
+        view_retake_create_panel.setVisible(true);
+    }
+
+
+    /**
+     * Creates a new retakeBean object from user input fields
+     *
+     * @param retake_id_input JTextField component where quiz id attribute is entered
+     * @param retake_location_input JTextField component where retake location is entered
+     * @param retake_month_input JTextField component where quiz month attribute is entered
+     * @param retake_day_input JTextField component where quiz day attribute is entered
+     * @param retake_hour_input JTextField component where quiz hour attribute is entered
+     * @param retake_minute_input JTextField component where quiz minute attribute is entered
+     * @return retakeBean object instance constructed with inputted values to JTextField components
+     */
+    private retakeBean create_new_retake_from_form(JTextField retake_id_input, JTextField retake_location_input, JTextField retake_month_input, JTextField retake_day_input, JTextField retake_hour_input, JTextField retake_minute_input) throws Exception {
+        retakeBean new_retake;
+
+        int retake_id;
+        String location;
+        int month;
+        int day;
+        int hour;
+        int minute;
+
+        //checking retake id
+        if(retake_id_input.getText().equals("")){
+            throw new InvalidIdException("Retake id cannot be empty or null");
+        }
+        else if(retake_id_input.getText().equals("0")){
+            throw new InvalidIdException("Retake id cannot be zero");
+        }
+        else{
+            try {
+                retake_id = Integer.parseInt(retake_id_input.getText());
+            }
+            catch(Exception e){
+                throw new InvalidIdException("Retake id invalid");
+            }
+
+            if(retake_id < 0){
+                throw new InvalidIdException("Retake id cannot be negative");
+            }
+
+        }
+        //checking location
+        if(retake_location_input.getText().equals("")){
+            throw new InvalidLocationException("Location cannot be null or empty");
+        }
+        else{
+            location = retake_location_input.getText();
+        }
+
+        //checking month
+        if(retake_month_input.getText().equals("")){
+            throw new InvalidTimeException("Retake month cannot be empty or null");
+        }
+        else if(retake_month_input.getText().equals("0")){
+            throw new InvalidTimeException("Retake month cannot be zero");
+        }
+        else{
+            try {
+                month = Integer.parseInt(retake_month_input.getText());
+            }
+            catch(Exception e){
+                throw new InvalidTimeException("Invalid retake month");
+            }
+
+            if(month < 0){
+                throw new InvalidTimeException("Retake month cannot be negative");
+            }
+            else if(month > 12){
+                throw new InvalidTimeException("Retake month must be between 1 and 12");
+            }
+        }
+
+        //checking day
+        if(retake_day_input.getText().equals("")){
+            throw new InvalidTimeException("Retake day cannot be empty or null");
+        }
+        else if(retake_day_input.getText().equals("0")){
+            throw new InvalidTimeException("Retake day cannot be zero");
+        }
+        else{
+            LocalDate test_date;
+            try {
+                day = Integer.parseInt(retake_day_input.getText());
+                if (day < 0) {
+                    throw new InvalidTimeException("Retake day cannot be negative");
+                } else if (day > 31) {
+                    throw new InvalidTimeException("Retake day must be between 1 and 31");
+                }
+                test_date = LocalDate.of(2019,month,day);
+            }
+            catch (Exception e){
+
+                throw new InvalidTimeException("Invalid retake day");
+            }
+            if(test_date.getDayOfWeek().equals(DayOfWeek.SATURDAY) || test_date.getDayOfWeek().equals(DayOfWeek.SUNDAY)){
+                throw new InvalidTimeException("Retake cannot be scheduled on a weekend");
+            }
+            else if((!(test_date.isBefore(course.getStartSkip())) && !(test_date.isAfter(course.getEndSkip()))) || test_date.isEqual(course.getStartSkip()) || test_date.isEqual(course.getEndSkip())){
+                throw new InvalidTimeException("Retake cannot be scheduled during course skip week");
+            }
+
+        }
+
+        //checking hour
+        if(retake_hour_input.getText().equals("")){
+            throw new InvalidTimeException("Retake hour cannot be empty or null");
+        }
+        else{
+            try {
+                hour = Integer.parseInt(retake_hour_input.getText());
+            }
+            catch (Exception e){
+                throw new InvalidTimeException("Invalid retake hour");
+            }
+            if (hour < 0) {
+                throw new InvalidTimeException("Retake hour cannot be negative");
+            } else if (hour > 23) {
+                throw new InvalidTimeException("Retake hour must be between 0 and 23");
+            }
+
+        }
+
+        //checking minute
+        if(retake_minute_input.getText().equals("")){
+            throw new InvalidTimeException("Retake minute cannot be empty or null");
+        }
+        else{
+            try {
+                minute = Integer.parseInt(retake_minute_input.getText());
+
+            }
+            catch (Exception e){
+                throw new InvalidTimeException("Invalid retake minute");
+            }
+            if (minute < 0) {
+                throw new InvalidTimeException("Retake minute cannot be negative");
+            } else if (minute >= 60) {
+                throw new InvalidTimeException("Retake minute must be between 0 and 59");
+            }
+
+        }
+
+        new_retake = new retakeBean(retake_id,location,month,day,hour,minute);
+        return new_retake;
+    }
+
+
+    /**
+     * Method screens new quiz object against current list of quizzes and adds it and writes it to .xml file if valid
+     *
+     * @param new_retake retakeBean object to be added
+     */
+    private void add_new_retake(retakeBean new_retake) throws Exception{
+        for(retakeBean retake : retakesList){
+            if(retake.getID() == new_retake.getID()){
+                throw new InvalidRetakeException("Cannot have duplicate retake id's");
+            }
+            if(retake.dateAsString().equals(new_retake.dateAsString())){
+                throw new InvalidRetakeException("Cannot have two retakes on the same date at same time");
+            }
+        }
+
+        //if traversal successful, attempt to add new retake to data file using writer class
+        retakesList.addRetake(new_retake);
+        retakeWriter rw = new retakeWriter();
+        rw.write(retakesFileName, retakesList);
     }
 
 

@@ -60,6 +60,21 @@ public class retakeBean implements Comparable<retakeBean>
    {
       return retakeID;
    }
+   public String getIDStr(){
+      return String.format("%d", retakeID);
+   }
+   public String getMonthStr(){
+      return String.format("%d", whenOffered.getMonthValue());
+   }
+   public String getDayStr(){
+      return String.format("%d", whenOffered.getDayOfMonth());
+   }
+   public String getHourStr(){
+      return String.format("%d", timeOffered.getHour());
+   }
+   public String getMinuteStr(){
+      return String.format("%d", timeOffered.getMinute());
+   }
    public String toString()
    {
       return retakeID + ": " +

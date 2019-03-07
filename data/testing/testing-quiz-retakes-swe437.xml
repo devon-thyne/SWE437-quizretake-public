@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<retakes>
+    <retake>
+        <id>1</id>
+        <location>Buchanan D023</location>
+        <dateGiven>
+            <month>3</month>
+            <day>7</day>
+            <hour>10</hour>
+            <minute>0</minute>
+        </dateGiven>
+    </retake>
+    <retake>
+        <id>2</id>
+        <location>ENGR 5431</location>
+        <dateGiven>
+            <month>3</month>
+            <day>21</day>
+            <hour>10</hour>
+            <minute>0</minute>
+        </dateGiven>
+    </retake>
+</retakes>

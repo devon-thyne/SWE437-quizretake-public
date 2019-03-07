@@ -54,6 +54,19 @@ public class quizBean implements Comparable<quizBean>
    {
       return ID;
    }
+   public String getIDStr() { return String.format("%d", ID); }
+   public String getMonthStr(){
+      return String.format("%d", dateGiven.getMonthValue());
+   }
+   public String getDayStr(){
+      return String.format("%d", dateGiven.getDayOfMonth());
+   }
+   public String getHourStr(){
+      return String.format("%d", timeGiven.getHour());
+   }
+   public String getMinuteStr(){
+      return String.format("%d", timeGiven.getMinute());
+   }
    public String toString()
    {
       return ID + ": " +
