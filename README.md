@@ -1,6 +1,6 @@
 # SWE 473
 
-SWE 437 Software Testing and Maintenence quizretake applet assignment.
+SWE 437 Software Testing and Maintenence quizretake applet assignment
 
 Overview
 --------
